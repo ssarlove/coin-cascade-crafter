@@ -8,10 +8,11 @@
     "version": "1",
     "name": "Coin Cascade Chaos",
     "homeUrl": "https://coin-cascade-jade.vercel.app",
+    "imageURL": "https://ibb.co.com/svC5jR0q"
     "iconUrl": "https://i.ibb.co/7xC045cM/Untitled-design-1.png",
     "splashImageUrl": "https://i.ibb.co/7xC045cM/Untitled-design-1.png",
     "splashBackgroundColor": "#000000",
-    "webhookUrl": "https://ibb.co.com/svC5jR0q/api/webhook",
+    "webhookUrl": "https://coin-cascade-jade.vercel.app/api/webhook",
     "subtitle": "Fast, Fun",
     "description": "Tap until you become a retarded based individual",
     "screenshotUrls": [
