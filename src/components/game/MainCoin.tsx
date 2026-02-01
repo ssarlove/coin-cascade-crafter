@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import vhsCoin from '@/assets/vhs-coin.png';
 
 interface MainCoinProps {
   onClick: () => number;
@@ -57,14 +58,13 @@ export function MainCoin({ onClick, onFloatingNumber }: MainCoinProps) {
 
       {/* Main coin */}
       <motion.div
-        className="relative flex cursor-pointer select-none items-center justify-center border-5 border-foreground bg-retro-gold text-6xl font-bold"
+        className="relative flex cursor-pointer select-none items-center justify-center border-4 border-foreground overflow-hidden"
         style={{
           width: 140,
           height: 140,
           boxShadow: `
-            10px 10px 0 hsl(0 0% 0%),
-            inset -6px -6px 0 hsl(43 100% 36%),
-            inset 6px 6px 0 hsl(60 100% 90%)
+            8px 8px 0 hsl(0 0% 0%),
+            inset 0 0 20px hsl(0 0% 0% / 0.5)
           `,
         }}
         animate={{
@@ -96,21 +96,23 @@ export function MainCoin({ onClick, onFloatingNumber }: MainCoinProps) {
           }}
         />
         
-        <motion.span
+        <motion.img
+          src={vhsCoin}
+          alt="VHS Coin"
+          className="w-full h-full object-cover"
+          style={{ imageRendering: 'pixelated' }}
           animate={{
-            textShadow: [
-              '0 0 10px hsl(51 100% 50%)',
-              '0 0 20px hsl(51 100% 70%)',
-              '0 0 10px hsl(51 100% 50%)',
+            filter: [
+              'brightness(1) contrast(1.1)',
+              'brightness(1.2) contrast(1.2)',
+              'brightness(1) contrast(1.1)',
             ],
           }}
           transition={{
             duration: 1,
             repeat: Infinity,
           }}
-        >
-          $
-        </motion.span>
+        />
       </motion.div>
     </div>
   );
