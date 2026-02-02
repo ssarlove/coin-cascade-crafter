@@ -109,3 +109,64 @@
     );
   }
 }
+
+/* RainbowKit 90s VHS Override Styles */
+[data-rk] {
+  --rk-radii-actionButton: 0px !important;
+  --rk-radii-connectButton: 0px !important;
+  --rk-radii-menuButton: 0px !important;
+  --rk-radii-modal: 0px !important;
+  --rk-radii-modalMobile: 0px !important;
+}
+
+/* Modal scanline effect */
+[data-rk] [role="dialog"] {
+  border: 4px solid hsl(180 100% 50%) !important;
+  box-shadow: 8px 8px 0 hsl(300 100% 50%), inset 0 0 100px rgba(0, 255, 0, 0.1) !important;
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px),
+    #000 !important;
+  animation: crt-flicker 0.15s infinite;
+}
+
+@keyframes crt-flicker {
+  0%, 100% { filter: brightness(1) contrast(1); }
+  50% { filter: brightness(1.02) contrast(1.02); }
+}
+
+/* Wallet option buttons */
+[data-rk] button {
+  border-radius: 0 !important;
+  font-family: 'Courier New', monospace !important;
+  text-transform: uppercase;
+  transition: transform 0.1s, box-shadow 0.1s !important;
+}
+
+[data-rk] button:hover {
+  transform: scale(1.02) rotate(1deg) !important;
+}
+
+/* Wallet icons pixelated */
+[data-rk] img {
+  image-rendering: pixelated;
+}
+
+/* Close button retro style */
+[data-rk] [aria-label="Close"] {
+  border: 3px solid hsl(60 100% 50%) !important;
+  background: hsl(0 100% 50%) !important;
+}
+
+/* Title text glow */
+[data-rk] h1, [data-rk] h2 {
+  font-family: 'Impact', sans-serif !important;
+  text-shadow: 0 0 10px hsl(120 100% 50%);
+  text-transform: uppercase;
+}
+
+/* Wallet list items */
+[data-rk] [data-testid="rk-wallet-option"] {
+  border: 3px solid hsl(0 0% 0%) !important;
+  margin: 4px !important;
+  box-shadow: 4px 4px 0 hsl(0 0% 0%) !important;
+}
