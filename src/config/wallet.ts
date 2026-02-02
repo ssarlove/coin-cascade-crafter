@@ -1,9 +1,14 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { createConfig, http } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
+import { injected } from 'wagmi/connectors';
 
-export const config = getDefaultConfig({
-  appName: 'MONEY_MACHINE_FIXED.EXE',
-  projectId: 'money-machine-clicker', // For WalletConnect - can use any string for dev
+export const config = createConfig({
   chains: [base, baseSepolia],
+  connectors: [injected()],
+  transports: {
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
+  },
+  multiInjectedProviderDiscovery: false,
   ssr: false,
 });
