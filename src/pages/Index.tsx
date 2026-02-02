@@ -10,7 +10,9 @@ import { BoostItem } from '@/components/game/BoostItem';
 import { OrbitIcons } from '@/components/game/OrbitIcons';
 import { ActiveBoostsBar } from '@/components/game/ActiveBoostsBar';
 import { WalletButton } from '@/components/game/WalletButton';
-import { useGameStore, formatNum } from '@/hooks/useGameStore';
+import { EthBoostItem, ETH_BOOSTS } from '@/components/game/EthBoostItem';
+import { OwnedItemsPanel } from '@/components/game/OwnedItemsPanel';
+import { useGameStore, formatNum, Upgrade } from '@/hooks/useGameStore';
 
 interface FloatingNum {
   id: string;
@@ -21,9 +23,10 @@ interface FloatingNum {
 
 export default function Index() {
   const game = useGameStore();
-  const [activeTab, setActiveTab] = useState<'upgrades' | 'boosts'>('upgrades');
+  const [activeTab, setActiveTab] = useState<'upgrades' | 'boosts' | 'eth'>('upgrades');
   const [floatingNumbers, setFloatingNumbers] = useState<FloatingNum[]>([]);
   const [goblin, setGoblin] = useState({ visible: false, x: 200, y: 160 });
+  const [panelUpgrade, setPanelUpgrade] = useState<Upgrade | null>(null);
 
   const addFloatingNumber = useCallback((x: number, y: number, value: number) => {
     const id = `${Date.now()}-${Math.random()}`;
@@ -43,6 +46,10 @@ export default function Index() {
     addFloatingNumber(goblin.x + 200, goblin.y + 200, reward);
     setGoblin(g => ({ ...g, visible: false }));
   }, [game, goblin, addFloatingNumber]);
+
+  const handleSwipeLeft = useCallback((upgrade: Upgrade) => {
+    setPanelUpgrade(upgrade);
+  }, []);
 
   // Goblin spawning
   useEffect(() => {
@@ -83,7 +90,7 @@ export default function Index() {
 
       {/* Tabs */}
       <div className="flex border-b-4 border-foreground bg-foreground">
-        {(['upgrades', 'boosts'] as const).map((tab) => (
+        {(['upgrades', 'boosts', 'eth'] as const).map((tab) => (
           <motion.button
             key={tab}
             className={`flex-1 border-r-4 border-foreground py-3 font-impact text-lg uppercase last:border-r-0 ${
@@ -95,7 +102,7 @@ export default function Index() {
             whileHover={{ backgroundColor: 'hsl(60 100% 50%)' }}
             whileTap={{ scale: 0.98 }}
           >
-            {tab} {tab === 'boosts' && '(2)'}
+            {tab === 'eth' ? '⟠ ETH' : tab}
           </motion.button>
         ))}
       </div>
@@ -153,6 +160,7 @@ export default function Index() {
                     upgrade={upgrade}
                     canAfford={game.canAfford(upgrade.cost)}
                     onBuy={() => game.buyUpgrade(upgrade.id)}
+                    onSwipeLeft={() => handleSwipeLeft(upgrade)}
                     index={index}
                   />
                 ))}
@@ -178,6 +186,28 @@ export default function Index() {
                 ))}
               </motion.div>
             )}
+
+            {activeTab === 'eth' && (
+              <motion.div
+                key="eth"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div className="mb-3 border-4 border-foreground bg-black p-2 text-center font-mono text-xs text-retro-green">
+                  ⟠ PAY GAS ONLY • SPECIAL ABILITIES • PERMANENT ⟠
+                </div>
+                {ETH_BOOSTS.map((boost, index) => (
+                  <EthBoostItem
+                    key={boost.id}
+                    boost={boost}
+                    isPurchased={game.ethBoostsPurchased.includes(boost.id)}
+                    onPurchased={game.applyEthBoost}
+                    index={index}
+                  />
+                ))}
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>
@@ -195,6 +225,13 @@ export default function Index() {
           />
         ))}
       </AnimatePresence>
+
+      {/* Owned Items Panel */}
+      <OwnedItemsPanel
+        isOpen={!!panelUpgrade}
+        onClose={() => setPanelUpgrade(null)}
+        upgrade={panelUpgrade}
+      />
     </div>
   );
 }

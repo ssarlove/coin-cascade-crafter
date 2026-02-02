@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useAccount } from 'wagmi';
 
 export interface Upgrade {
   id: string;
@@ -58,17 +59,92 @@ export const formatNum = (n: number): string => {
   return Math.floor(n).toString();
 };
 
+const STORAGE_KEY = 'money_machine_state_';
+
+interface SavedState {
+  coins: number;
+  upgrades: { id: string; count: number; cost: number }[];
+  clickPowerBase: number;
+  autoRateBase: number;
+  ethBoostsPurchased: string[];
+  ethClickMultiplier: number;
+  ethAutoMultiplier: number;
+  critChance: number;
+}
+
 export function useGameStore() {
+  const { address, isConnected } = useAccount();
   const [coins, setCoins] = useState(0);
-  const [clickPower, setClickPower] = useState(1);
-  const [autoRate, setAutoRate] = useState(0);
+  const [clickPowerBase, setClickPowerBase] = useState(1);
+  const [autoRateBase, setAutoRateBase] = useState(0);
   const [upgrades, setUpgrades] = useState<Upgrade[]>(initialUpgrades);
   const [activeEffects, setActiveEffects] = useState<ActiveEffect[]>([]);
+  const [ethBoostsPurchased, setEthBoostsPurchased] = useState<string[]>([]);
+  const [ethClickMultiplier, setEthClickMultiplier] = useState(1);
+  const [ethAutoMultiplier, setEthAutoMultiplier] = useState(1);
+  const [critChance, setCritChance] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  
   const effectsRef = useRef(activeEffects);
+  const lastSaveRef = useRef(0);
   
   useEffect(() => {
     effectsRef.current = activeEffects;
   }, [activeEffects]);
+
+  // Load state when wallet connects
+  useEffect(() => {
+    if (!address || loaded) return;
+    
+    const key = STORAGE_KEY + address.toLowerCase();
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const state: SavedState = JSON.parse(saved);
+        setCoins(state.coins || 0);
+        setClickPowerBase(state.clickPowerBase || 1);
+        setAutoRateBase(state.autoRateBase || 0);
+        setEthBoostsPurchased(state.ethBoostsPurchased || []);
+        setEthClickMultiplier(state.ethClickMultiplier || 1);
+        setEthAutoMultiplier(state.ethAutoMultiplier || 1);
+        setCritChance(state.critChance || 0);
+        
+        // Merge saved upgrades with initial
+        if (state.upgrades) {
+          setUpgrades(prev => prev.map(u => {
+            const saved = state.upgrades.find(s => s.id === u.id);
+            return saved ? { ...u, count: saved.count, cost: saved.cost } : u;
+          }));
+        }
+        console.log('Game loaded for wallet:', address);
+      }
+    } catch (e) {
+      console.error('Failed to load game:', e);
+    }
+    setLoaded(true);
+  }, [address, loaded]);
+
+  // Save state periodically
+  useEffect(() => {
+    if (!address || !loaded) return;
+    
+    const interval = setInterval(() => {
+      const key = STORAGE_KEY + address.toLowerCase();
+      const state: SavedState = {
+        coins,
+        upgrades: upgrades.map(u => ({ id: u.id, count: u.count, cost: u.cost })),
+        clickPowerBase,
+        autoRateBase,
+        ethBoostsPurchased,
+        ethClickMultiplier,
+        ethAutoMultiplier,
+        critChance,
+      };
+      localStorage.setItem(key, JSON.stringify(state));
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [address, loaded, coins, upgrades, clickPowerBase, autoRateBase, ethBoostsPurchased, ethClickMultiplier, ethAutoMultiplier, critChance]);
 
   const getMultiplier = useCallback((target: 'click' | 'auto') => {
     return effectsRef.current
@@ -76,16 +152,22 @@ export function useGameStore() {
       .reduce((acc, e) => acc * e.multiplier, 1);
   }, []);
 
-  const effectiveClickPower = clickPower * getMultiplier('click');
-  const effectiveAutoRate = autoRate * getMultiplier('auto');
+  const effectiveClickPower = clickPowerBase * getMultiplier('click') * ethClickMultiplier;
+  const effectiveAutoRate = autoRateBase * getMultiplier('auto') * ethAutoMultiplier;
 
   const click = useCallback(() => {
-    const power = clickPower * effectsRef.current
+    let power = clickPowerBase * effectsRef.current
       .filter(e => e.target === 'click')
-      .reduce((acc, e) => acc * e.multiplier, 1);
+      .reduce((acc, e) => acc * e.multiplier, 1) * ethClickMultiplier;
+    
+    // Crit chance from Lucky Coin
+    if (critChance > 0 && Math.random() < critChance) {
+      power *= 2;
+    }
+    
     setCoins(c => c + power);
     return power;
-  }, [clickPower]);
+  }, [clickPowerBase, ethClickMultiplier, critChance]);
 
   const buyUpgrade = useCallback((id: string) => {
     setUpgrades(prev => {
@@ -94,8 +176,8 @@ export function useGameStore() {
       
       setCoins(c => {
         if (c < upgrade.cost) return c;
-        setAutoRate(r => r + upgrade.auto);
-        setClickPower(p => p + upgrade.power);
+        setAutoRateBase(r => r + upgrade.auto);
+        setClickPowerBase(p => p + upgrade.power);
         return c - upgrade.cost;
       });
 
@@ -130,11 +212,36 @@ export function useGameStore() {
     return true;
   }, []);
 
+  const applyEthBoost = useCallback((boostId: string) => {
+    if (ethBoostsPurchased.includes(boostId)) return;
+    
+    setEthBoostsPurchased(prev => [...prev, boostId]);
+    
+    switch (boostId) {
+      case 'golden_touch':
+        setCoins(c => c + 1000000);
+        break;
+      case 'time_warp':
+        // Add 5 minutes of auto income
+        setCoins(c => c + autoRateBase * ethAutoMultiplier * 300);
+        break;
+      case 'whale_mode':
+        setEthClickMultiplier(m => m * 5);
+        break;
+      case 'robot_army':
+        setEthAutoMultiplier(m => m * 3);
+        break;
+      case 'lucky_coin':
+        setCritChance(c => c + 0.1);
+        break;
+    }
+  }, [ethBoostsPurchased, autoRateBase, ethAutoMultiplier]);
+
   const collectGoblin = useCallback(() => {
-    const reward = autoRate * 60 * 5;
+    const reward = autoRateBase * ethAutoMultiplier * 60 * 5;
     setCoins(c => c + reward);
     return reward;
-  }, [autoRate]);
+  }, [autoRateBase, ethAutoMultiplier]);
 
   // Auto income tick
   useEffect(() => {
@@ -142,10 +249,10 @@ export function useGameStore() {
       const mult = effectsRef.current
         .filter(e => e.target === 'auto')
         .reduce((acc, e) => acc * e.multiplier, 1);
-      setCoins(c => c + autoRate * mult);
+      setCoins(c => c + autoRateBase * mult * ethAutoMultiplier);
     }, 1000);
     return () => clearInterval(interval);
-  }, [autoRate]);
+  }, [autoRateBase, ethAutoMultiplier]);
 
   // Effect timer tick
   useEffect(() => {
@@ -166,9 +273,11 @@ export function useGameStore() {
     upgrades,
     boosts,
     activeEffects,
+    ethBoostsPurchased,
     click,
     buyUpgrade,
     buyBoost,
+    applyEthBoost,
     collectGoblin,
     canAfford: (cost: number) => coins >= cost,
   };
