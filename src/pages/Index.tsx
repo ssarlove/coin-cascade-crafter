@@ -9,6 +9,7 @@ import { UpgradeItem } from '@/components/game/UpgradeItem';
 import { BoostItem } from '@/components/game/BoostItem';
 import { OrbitIcons } from '@/components/game/OrbitIcons';
 import { ActiveBoostsBar } from '@/components/game/ActiveBoostsBar';
+import { WalletButton } from '@/components/game/WalletButton';
 import { useGameStore, formatNum } from '@/hooks/useGameStore';
 
 interface FloatingNum {
@@ -69,13 +70,15 @@ export default function Index() {
 
       {/* Header */}
       <motion.div
-        className="border-b-6 border-foreground bg-primary py-3 text-center font-impact text-3xl text-primary-foreground md:text-4xl"
+        className="flex items-center justify-between border-b-6 border-foreground bg-primary px-4 py-3 font-impact text-3xl text-primary-foreground md:text-4xl"
         style={{ textShadow: '3px 3px 0 hsl(0 100% 50%)' }}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       >
-        MONEY_MACHINE_FIXED.EXE
+        <span className="hidden md:inline">💾</span>
+        <span>MONEY_MACHINE_FIXED.EXE</span>
+        <WalletButton />
       </motion.div>
 
       {/* Tabs */}
