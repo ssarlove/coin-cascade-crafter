@@ -9,7 +9,7 @@ import { UpgradeItem } from '@/components/game/UpgradeItem';
 import { BoostItem } from '@/components/game/BoostItem';
 import { OrbitIcons } from '@/components/game/OrbitIcons';
 import { ActiveBoostsBar } from '@/components/game/ActiveBoostsBar';
-import { WalletButton } from '@/components/game/WalletButton';
+import WalletButton  from '@/components/game/WalletButton';
 import { EthBoostItem, ETH_BOOSTS } from '@/components/game/EthBoostItem';
 import { OwnedItemsPanel } from '@/components/game/OwnedItemsPanel';
 import { useGameStore, formatNum, Upgrade } from '@/hooks/useGameStore';
