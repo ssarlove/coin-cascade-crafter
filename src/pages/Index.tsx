@@ -77,14 +77,13 @@ export default function Index() {
 
       {/* Header */}
       <motion.div
-        className="flex items-center justify-between border-b-6 border-foreground bg-primary px-4 py-3 font-impact text-3xl text-primary-foreground md:text-4xl"
+        className="flex items-center justify-between border-b-6 border-foreground bg-primary px-4 py-3 font-impact text-2xl text-primary-foreground sm:text-3xl md:text-4xl"
         style={{ textShadow: '3px 3px 0 hsl(0 100% 50%)' }}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       >
-        <span className="hidden md:inline">💾</span>
-        <span>MONEY_MACHINE_FIXED.EXE</span>
+        <span>MONEY_MACHINE.EXE</span>
         <WalletButton />
       </motion.div>
 
@@ -120,7 +119,7 @@ export default function Index() {
           />
 
           {/* Coin Stage */}
-          <div className="relative mx-auto" style={{ width: 400, height: 320 }}>
+          <div className="relative mx-auto w-full max-w-[400px]" style={{ height: 320 }}>
             {/* Center coin */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <MainCoin onClick={handleCoinClick} onFloatingNumber={addFloatingNumber} />
