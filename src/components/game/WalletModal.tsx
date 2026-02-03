@@ -42,6 +42,35 @@ const WalletConnectLogo = () => (
   </svg>
 )
 
+const PhantomLogo = () => (
+  <svg viewBox="0 0 40 40" className="w-full h-full">
+    <defs>
+      <linearGradient id="phantom-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#534BB1"/>
+        <stop offset="100%" stopColor="#551BF9"/>
+      </linearGradient>
+    </defs>
+    <rect width="40" height="40" rx="8" fill="url(#phantom-grad)"/>
+    <path d="M29.5 20.5c0 5.25-4.25 9.5-9.5 9.5s-9.5-4.25-9.5-9.5c0-5.25 4.25-9.5 9.5-9.5h1c0 1.1-.9 2-2 2h-.5c-3.58 0-6.5 2.92-6.5 6.5s2.92 6.5 6.5 6.5 6.5-2.92 6.5-6.5v-1.5c0-1.1.9-2 2-2s2 .9 2 2v2.5z" fill="#fff"/>
+    <circle cx="14.5" cy="20" r="2" fill="#fff"/>
+    <circle cx="20" cy="20" r="2" fill="#fff"/>
+  </svg>
+)
+
+const KeplrLogo = () => (
+  <svg viewBox="0 0 40 40" className="w-full h-full">
+    <defs>
+      <linearGradient id="keplr-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#7B68EE"/>
+        <stop offset="50%" stopColor="#4169E1"/>
+        <stop offset="100%" stopColor="#00BFFF"/>
+      </linearGradient>
+    </defs>
+    <rect width="40" height="40" rx="8" fill="url(#keplr-grad)"/>
+    <path d="M12 10h4v20h-4zM18 10h4l6 10-6 10h-4l6-10z" fill="#fff"/>
+  </svg>
+)
+
 const BaseLogo = () => (
   <svg viewBox="0 0 40 40" className="w-full h-full">
     <circle cx="20" cy="20" r="20" fill="#0052FF"/>
@@ -63,6 +92,8 @@ const getWalletLogo = (name: string) => {
   if (lowerName.includes('metamask')) return <MetaMaskLogo />
   if (lowerName.includes('coinbase')) return <CoinbaseLogo />
   if (lowerName.includes('walletconnect')) return <WalletConnectLogo />
+  if (lowerName.includes('phantom')) return <PhantomLogo />
+  if (lowerName.includes('keplr')) return <KeplrLogo />
   if (lowerName.includes('base')) return <BaseLogo />
   return <InjectedLogo />
 }
@@ -71,6 +102,8 @@ const walletDescriptions: Record<string, string> = {
   'MetaMask': 'POPULAR BROWSER WALLET',
   'Coinbase Wallet': 'BASE NATIVE • SMART WALLET',
   'WalletConnect': 'SCAN QR TO CONNECT',
+  'Phantom': 'SOLANA & EVM WALLET',
+  'Keplr': 'COSMOS ECOSYSTEM',
   'Injected': 'USE BROWSER WALLET',
 }
 
@@ -103,51 +136,53 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
           
           {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, rotate: -2 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, scale: 0.8, rotate: 2 }}
-            transition={{ type: 'spring', damping: 20 }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', damping: 25 }}
             className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50
-                       w-[90vw] max-w-[400px] bg-black
-                       border-4 border-retro-cyan
+                       w-[90vw] max-w-[380px]
+                       border-4 border-foreground
                        overflow-hidden"
             style={{
-              boxShadow: '8px 8px 0 hsl(var(--retro-magenta)), -4px -4px 0 hsl(var(--retro-yellow))',
+              boxShadow: '6px 6px 0 hsl(0 0% 0%)',
+              background: 'linear-gradient(180deg, hsl(var(--retro-magenta)) 0%, hsl(300 100% 35%) 100%)',
             }}
           >
             {/* CRT Scanlines overlay */}
             <div 
-              className="absolute inset-0 pointer-events-none z-10 opacity-20"
+              className="absolute inset-0 pointer-events-none z-10 opacity-10"
               style={{
-                background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)',
+                background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
               }}
             />
             
             {/* Header */}
-            <div className="relative bg-gradient-to-r from-retro-cyan to-retro-magenta p-3 border-b-4 border-black">
-              <h2 className="font-pixel text-[10px] sm:text-[12px] text-black text-center tracking-wider">
-                ◈ SELECT WALLET ◈
+            <div className="relative bg-retro-yellow p-3 border-b-4 border-foreground">
+              <h2 className="font-impact text-xl text-foreground text-center tracking-wide"
+                  style={{ textShadow: '2px 2px 0 hsl(var(--retro-red))' }}>
+                ⟠ CONNECT WALLET ⟠
               </h2>
               <button
                 onClick={onClose}
                 className="absolute right-2 top-1/2 -translate-y-1/2 
-                           w-8 h-8 bg-retro-red border-2 border-black
+                           w-8 h-8 bg-retro-red border-2 border-foreground
                            flex items-center justify-center
-                           hover:bg-retro-yellow transition-colors"
+                           hover:bg-card transition-colors retro-shadow-sm"
               >
-                <X className="w-4 h-4 text-black" />
+                <X className="w-4 h-4 text-foreground" />
               </button>
             </div>
             
-            {/* VHS Label */}
-            <div className="bg-retro-yellow/20 border-b-2 border-retro-yellow/50 px-3 py-1">
-              <p className="font-pixel text-[6px] text-retro-yellow text-center animate-pulse">
-                ▸ CONNECTING TO BASE NETWORK ▸
+            {/* Status Bar */}
+            <div className="bg-foreground px-3 py-1.5">
+              <p className="font-pixel text-[8px] text-retro-green text-center terminal-glow">
+                ▸ BASE NETWORK READY ▸
               </p>
             </div>
             
             {/* Wallet List */}
-            <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+            <div className="p-3 space-y-2 max-h-[50vh] overflow-y-auto bg-card">
               {connectors.map((connector, index) => {
                 const isConnecting = isPending && variables?.connector === connector
                 
@@ -156,54 +191,49 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                     key={connector.uid}
                     onClick={() => handleConnect(connector)}
                     disabled={isPending}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.02, x: 4 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full p-3 bg-gradient-to-r from-gray-900 to-gray-800
-                               border-2 border-retro-cyan/50 hover:border-retro-cyan
-                               flex items-center gap-4
+                    className="w-full p-2.5 bg-muted
+                               border-4 border-foreground
+                               flex items-center gap-3
                                disabled:opacity-50 disabled:cursor-not-allowed
-                               group relative overflow-hidden"
+                               group relative overflow-hidden
+                               hover:bg-retro-yellow transition-colors"
                     style={{
-                      boxShadow: '4px 4px 0 rgba(0,255,255,0.3)',
+                      boxShadow: '4px 4px 0 hsl(0 0% 0%)',
                     }}
                   >
-                    {/* Hover glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-retro-cyan/0 to-retro-cyan/20 
-                                    opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
                     {/* Logo */}
-                    <div className="w-12 h-12 bg-black border-2 border-retro-yellow p-1
-                                    flex items-center justify-center
-                                    group-hover:border-retro-cyan transition-colors">
+                    <div className="w-10 h-10 bg-card border-2 border-foreground p-1
+                                    flex items-center justify-center flex-shrink-0">
                       {getWalletLogo(connector.name)}
                     </div>
                     
                     {/* Text */}
-                    <div className="flex-1 text-left relative z-10">
-                      <p className="font-pixel text-[10px] text-retro-cyan group-hover:text-retro-yellow transition-colors">
+                    <div className="flex-1 text-left relative z-10 min-w-0">
+                      <p className="font-impact text-base text-foreground group-hover:text-foreground truncate">
                         {connector.name}
                       </p>
-                      <p className="font-pixel text-[6px] text-gray-500 mt-1">
+                      <p className="font-pixel text-[6px] text-muted-foreground group-hover:text-foreground/70 truncate">
                         {walletDescriptions[connector.name] || 'CLICK TO CONNECT'}
                       </p>
                     </div>
                     
                     {/* Arrow / Loading */}
-                    <div className="text-retro-cyan group-hover:text-retro-yellow 
-                                    group-hover:translate-x-1 transition-all font-pixel text-sm">
+                    <div className="text-foreground font-impact text-lg flex-shrink-0">
                       {isConnecting ? (
                         <motion.span
                           animate={{ rotate: 360 }}
                           transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
                           className="inline-block"
                         >
-                          ◈
+                          ⟠
                         </motion.span>
                       ) : (
-                        '▶'
+                        '→'
                       )}
                     </div>
                   </motion.button>
@@ -212,15 +242,10 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
             </div>
             
             {/* Footer */}
-            <div className="bg-black border-t-2 border-retro-cyan/30 p-3">
-              <p className="font-pixel text-[6px] text-gray-600 text-center">
-                🔒 SECURE CONNECTION • NO PRIVATE KEYS SHARED
+            <div className="bg-foreground p-2">
+              <p className="font-pixel text-[6px] text-retro-green text-center terminal-glow">
+                🔒 SECURE • NO KEYS SHARED
               </p>
-              <div className="flex justify-center gap-2 mt-2">
-                <span className="w-2 h-2 bg-retro-green animate-pulse" />
-                <span className="w-2 h-2 bg-retro-yellow animate-pulse" style={{ animationDelay: '0.2s' }} />
-                <span className="w-2 h-2 bg-retro-red animate-pulse" style={{ animationDelay: '0.4s' }} />
-              </div>
             </div>
           </motion.div>
         </>
