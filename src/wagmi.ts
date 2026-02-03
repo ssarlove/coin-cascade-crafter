@@ -1,16 +1,20 @@
 import { http, createConfig } from 'wagmi'
-import { mainnet } from 'wagmi/chains'
-import { injected, walletConnect } from 'wagmi/connectors'
+import { base, baseSepolia } from 'wagmi/chains'
+import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors'
 
 export const wagmiConfig = createConfig({
-  chains: [mainnet],
+  chains: [base, baseSepolia],
   connectors: [
     injected(),
+    coinbaseWallet({
+      appName: 'Coin Chaos Cascade',
+    }),
     walletConnect({
-      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
+      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'demo',
     }),
   ],
   transports: {
-    [mainnet.id]: http(),
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
   },
 })
